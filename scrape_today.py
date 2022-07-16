@@ -1,5 +1,7 @@
+import datetime
 import numpy as np
 import pandas as pd
+import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -43,30 +45,41 @@ if __name__ == "__main__":
     entry_url = "https://race.netkeiba.com/race/shutuba.html?race_id="
     # racelist = get_racelist()
     racelist = ['2回 福島 5日目', '3回 小倉 5日目', '1回 函館 11日目']
-    urls = []
+    races = []
     for s in racelist:
-        hold, place, dt = s.split()
-        c = yyyy + cc[place] + hold.strip("回").rjust(2, "0") + dt.strip("日目").rjust(2, "0")
-        urls.append(c)
+        times, place, dth = s.split()
+        hold = place + times + "_" + dth.strip("目")
+        url = yyyy + cc[place] + times.strip("回").rjust(2, "0") + dth.strip("日目").rjust(2, "0")
+        races.append((hold, url))
+    
+    for i, (hold, url) in enumerate(races):
+        # if i: continue
+        url01 = entry_url + url + "01"
+        soup = get_soup(url01)
+        yymmdd = ""
+        for e in soup.title.text.split():
+            if re.match("20[0-9]+年[0-9]+月[0-9]+日", e.strip()):
+                dt = datetime.datetime.strptime(e.strip(), "%Y年%m月%d日")
+                yymmdd = dt.strftime("%y%m%d")
 
-    for i, url in enumerate(urls):
-        if i: continue
         for j in range(1, 13):
             # if j != 1: continue
             raceurl = entry_url + url + str(j).rjust(2, "0")
             soup = get_soup(raceurl)
+            # print(soup.title)
             r = soup.select_one("div[class^='RaceList_Item']").select_one(".RaceNum").text
-            racename = soup.select_one("div.RaceList_Item02 .RaceName").text.strip()
-            print(r, racename)
+            racename = soup.title.text.split()[0]
+            # racename = soup.select_one("div.RaceList_Item02 .RaceName").text.strip()
             tag = soup.select_one("div.RaceList_Item02 .RaceData01")
-            print(tag.contents[3].split("/")[1].strip())
-            print(tag.select("span")[0].text.strip() + tag.contents[3].split("/")[0].strip())
-            print(tag.select_one("span[class^='Item']").text.replace("/", "").strip())
-            print(tag.text.split()[0])
-            print(soup.select_one("div.RaceList_Item02 .RaceData02").select("span")[-2].text)
 
-            # print(soup.prettify()[3000:9000])
-            # print(soup.title) # <title>３歳以上障害未勝利 出馬表 | 2022年7月16日 福島1R レース情報(JRA) - netkeiba.com</title>
+            course = tag.select("span")[0].text.strip() + tag.contents[3].split("/")[0].strip()
+            head_count = soup.select_one("div.RaceList_Item02 .RaceData02").select("span")[-2].text
+            weather = tag.contents[3].split("/")[1].strip()
+            condition = tag.select_one("span[class^='Item']").text.replace("/", "").strip()
+            start_time = tag.text.split()[0]
+
+            print(yymmdd, hold, r, racename, course, head_count, weather, condition, start_time)
+
             table = soup.select_one("table.Shutuba_Table")
             wakuban = [tag.text for tag in table.select("td[class^='Waku'] span")]
             umaban = [tag.text for tag in table.select("td[class^='Umaban']")]
