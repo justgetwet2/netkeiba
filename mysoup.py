@@ -22,7 +22,7 @@ def get_dfs(url: str) -> list:
             print(f"It's no table! {url}")
     return dfs
 
-netkeiba_url =  "https://www.netkeiba.com/"
+netkeiba_url =  "https://race.netkeiba.com/"
 
 if __name__ == "__main__":
 
