@@ -13,7 +13,7 @@ from odds_update import netkeiba_odds
 # from mysoup import get_soup, get_dfs, netkeiba_url
 
 # from tkhorse import AppHorse
-# from tkplot import AppPlot
+from tkplot import AppPlot
 # from tkentry import AppEntry
 # from tkcalc import AppCalc
 # from tkresult import AppResult
@@ -86,11 +86,18 @@ class AppRace(tk.Frame):
             command=lambda: self.update(),
             state=tk.NORMAL,
         )
+        plot_button = ttk.Button(
+            frame_buttons, 
+            text="bplot",
+            style="c.TButton",
+            command=lambda: self.plot_window(),
+            state=tk.NORMAL,
+        )
         # if not self.odds_d == {}:
         #     update_button["state"] = tk.DISABLED
         update_button.pack(side=tk.LEFT, padx=4)
         # entry_button.pack(side=tk.LEFT, padx=4)
-        # plot_button.pack(side=tk.LEFT, padx=4)
+        plot_button.pack(side=tk.LEFT, padx=4)
         # calc_button.pack(side=tk.LEFT, padx=4)
         # reslut_button.pack(padx=4)
 
@@ -123,6 +130,10 @@ class AppRace(tk.Frame):
 
         frame_entry.pack()
         
+    def plot_window(self):
+        root = tk.Toplevel(self)
+        app = AppPlot(self.race, master=root)
+        app.mainloop()
 
 if __name__ == "__main__":
 
@@ -130,7 +141,7 @@ if __name__ == "__main__":
     with open(p, "rb") as f:
         races = pickle.load(f)
 
-    race = races[5]
+    race = races[10]
     root = tk.Tk()
     app = AppRace(race, master=root)
     app.mainloop()

@@ -1,4 +1,5 @@
 import datetime
+import os
 import numpy as np
 import pandas as pd
 import pickle
@@ -27,14 +28,19 @@ cc['小倉'] = '10'
 
 def get_racelist():
     DRIVER = "../python-chromedriver-binary-103.0.5060.53.0-py38h50d1736_0/lib/python3.8/site-packages/chromedriver_binary/chromedriver"
-    # DRIVER = "../python-chromedriver-binary-103.0.5060.53.0-py38h32ec214_0/lib/site-packages/chromedriver_binary/chromedriver.exe"
-    service = fs.Service(executable_path=DRIVER)
+    if os.name == "nt":
+        DRIVER = "../python-chromedriver-binary-103.0.5060.53.0-py38h32ec214_0/lib/site-packages/chromedriver_binary/chromedriver.exe"        
+    service = fs.Service(executable_path=DRIVER, log_path=os.path.devnull)
+    if os.name == "nt":
+        from subprocess import CREATE_NO_WINDOW
+        service.creationflags = CREATE_NO_WINDOW
     options = Options()
     options.headless = True
-
     browser = webdriver.Chrome(service=service, options=options)
+    
     browser.get(netkeiba_url)
     print("(^^) a headless browser is connected.")
+
     elements = browser.find_elements(By.CSS_SELECTOR, "dl.RaceList_DataList")
     cs = "dt:nth-child(1) > div:nth-child(1) > p:nth-child(1)"
     racelist = [element.find_element(By.CSS_SELECTOR, cs).text for element in elements]

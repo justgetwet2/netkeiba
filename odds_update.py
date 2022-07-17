@@ -5,8 +5,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome import service as fs
 
 DRIVER = "../python-chromedriver-binary-103.0.5060.53.0-py38h50d1736_0/lib/python3.8/site-packages/chromedriver_binary/chromedriver"
-# DRIVER = "../python-chromedriver-binary-103.0.5060.53.0-py38h32ec214_0/lib/site-packages/chromedriver_binary/chromedriver.exe"
+if os.name == "nt":
+    DRIVER = "../python-chromedriver-binary-103.0.5060.53.0-py38h32ec214_0/lib/site-packages/chromedriver_binary/chromedriver.exe"        
 service = fs.Service(executable_path=DRIVER, log_path=os.path.devnull)
+if os.name == "nt":
+    from subprocess import CREATE_NO_WINDOW
+    service.creationflags = CREATE_NO_WINDOW
 options = Options()
 options.headless = True
 
