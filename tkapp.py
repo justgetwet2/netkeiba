@@ -5,7 +5,7 @@ import tkinter.ttk as ttk
 
 from tkrace import AppRace
 
-class AppDay(tk.Frame):
+class App(tk.Frame):
     def __init__(self, races, master=None):
         super().__init__(master)
         self.pack()
@@ -135,9 +135,9 @@ class AppDay(tk.Frame):
 if __name__ == "__main__":
 
     p = sys.argv[1]
+
     with open(p, "rb") as f:
         races = pickle.load(f)
 
     root = tk.Tk()
-    app = AppDay(races, master=root)
-    app.mainloop()
+    App(races, master=root).mainloop()
